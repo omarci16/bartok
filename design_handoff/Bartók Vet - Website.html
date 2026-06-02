@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bartók Állatorvosi Rendelő — Web design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    html, body { background: #1a1a18; }
+    /* Frame chrome */
+    .frame {
+      background: var(--paper);
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .frame-mobile {
+      background: var(--paper);
+      border-radius: 36px;
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,0.4), 0 0 0 12px #1a1a18, 0 0 0 13px #2a2a26;
+      overflow: hidden;
+      position: relative;
+    }
+    .frame-mobile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 28px;
+      background: #16181C;
+      border-radius: 0 0 16px 16px;
+      z-index: 100;
+    }
+    /* Browser chrome */
+    .browser-bar {
+      background: #EFE9DD;
+      border-bottom: 1px solid var(--stone);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dots span { width: 11px; height: 11px; border-radius: 50%; background: #d4cec0; }
+    .browser-url {
+      flex: 1;
+      background: var(--paper);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="shared.jsx"></script>
+  <script type="text/babel" src="page-home.jsx"></script>
+  <script type="text/babel" src="page-services.jsx"></script>
+  <script type="text/babel" src="page-doctors.jsx"></script>
+  <script type="text/babel" src="page-emergency.jsx"></script>
+  <script type="text/babel" src="page-contact.jsx"></script>
+  <script type="text/babel" src="page-mobile.jsx"></script>
+  <script type="text/babel" src="page-system.jsx"></script>
+
+  <script type="text/babel" data-presets="env,react">
+    const { useState } = React;
+
+    // Browser chrome wrapper
+    function BrowserChrome({ url, children, height = 1200 }) {
+      return (
+        <div className="frame" style={{ width: '100%', height }}>
+          <div className="browser-bar">
+            <div className="browser-dots">
+              <span style={{ background: '#E27D6A' }}/>
+              <span style={{ background: '#E5C26A' }}/>
+              <span style={{ background: '#7FA68C' }}/>
+            </div>
+            <div className="browser-url">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg>
+              bartokvet.hu{url}
+            </div>
+          </div>
+          <div style={{ height: `calc(100% - 41px)`, overflow: 'auto' }}>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    // Phone chrome wrapper (using inline frame)
+    function PhoneChrome({ children, height = 780 }) {
+      return (
+        <div className="frame-mobile" style={{ width: 380, height }}>
+          <div style={{ width: '100%', height: '100%', overflow: 'auto', position: 'relative' }}>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    // Wrapper: route across multiple pages from a starting page (used inside browser chrome)
+    function PageRouter({ initial = 'home' }) {
+      const [page, setPage] = useState(initial);
+      const onNav = (id) => {
+        setPage(id);
+        // scroll the parent scroll container to top
+        const sc = document.activeElement;
+        try {
+          // find ancestor scroll
+          let el = document.querySelector('.frame [style*="overflow"]');
+          if (el) el.scrollTop = 0;
+        } catch(e) {}
+      };
+      if (page === 'home') return <HomePage onNav={onNav}/>;
+      if (page === 'services') return <ServicesPage onNav={onNav}/>;
+      if (page === 'doctors') return <DoctorsPage onNav={onNav}/>;
+      if (page === 'emergency') return <EmergencyPage onNav={onNav}/>;
+      if (page === 'contact') return <ContactPage onNav={onNav}/>;
+      return <HomePage onNav={onNav}/>;
+    }
+
+    function App() {
+      return (
+        <DesignCanvas
+          title="Bartók Állatorvosi Rendelő"
+          subtitle="Modern, barátságos kisállat-rendelő · Debrecen · Komplett webdesign"
+        >
+          {/* DESKTOP PAGES */}
+          <DCSection id="desktop" title="Desktop oldalak" subtitle="Teljes oldalak — interaktív, görgethető. A felső navigáció oldalak között vált.">
+            <DCArtboard id="home" label="01 — Kezdőlap" width={1440} height={2400}>
+              <BrowserChrome url="/" height={2400}>
+                <PageRouter initial="home"/>
+              </BrowserChrome>
+            </DCArtboard>
+            <DCArtboard id="services" label="02 — Szolgáltatások" width={1440} height={2400}>
+              <BrowserChrome url="/szolgaltatasok" height={2400}>
+                <PageRouter initial="services"/>
+              </BrowserChrome>
+            </DCArtboard>
+            <DCArtboard id="doctors" label="03 — Állatorvosaink" width={1440} height={2400}>
+              <BrowserChrome url="/allatorvosaink" height={2400}>
+                <PageRouter initial="doctors"/>
+              </BrowserChrome>
+            </DCArtboard>
+            <DCArtboard id="emergency" label="04 — Sürgősség" width={1440} height={2200}>
+              <BrowserChrome url="/surgossegi" height={2200}>
+                <PageRouter initial="emergency"/>
+              </BrowserChrome>
+            </DCArtboard>
+            <DCArtboard id="contact" label="05 — Kapcsolat & foglalás" width={1440} height={2000}>
+              <BrowserChrome url="/kapcsolat" height={2000}>
+                <PageRouter initial="contact"/>
+              </BrowserChrome>
+            </DCArtboard>
+          </DCSection>
+
+          {/* MOBILE */}
+          <DCSection id="mobile" title="Mobil verzió" subtitle="iOS-méretű kerettel · görgethető · sticky foglalás CTA-val.">
+            <DCArtboard id="m-home" label="Kezdőlap — mobil" width={420} height={820}>
+              <PhoneChrome height={820}><MobileHome/></PhoneChrome>
+            </DCArtboard>
+            <DCArtboard id="m-services" label="Szolgáltatások — mobil" width={420} height={820}>
+              <PhoneChrome height={820}><MobileServices/></PhoneChrome>
+            </DCArtboard>
+            <DCArtboard id="m-emergency" label="Sürgősség — mobil" width={420} height={820}>
+              <PhoneChrome height={820}><MobileEmergency/></PhoneChrome>
+            </DCArtboard>
+          </DCSection>
+
+          {/* SYSTEM */}
+          <DCSection id="system" title="Design system" subtitle="Színek, tipográfia, komponensek és copywriting elvek.">
+            <DCArtboard id="ds" label="Vizuális rendszer" width={1280} height={2200}>
+              <div className="frame" style={{ width: '100%', height: 2200, overflow: 'auto' }}>
+                <DesignSystem/>
+              </div>
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
