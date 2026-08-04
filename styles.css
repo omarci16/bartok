@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ============================================
    Bartók Állatorvosi Rendelő — Design System
    ============================================ */
@@ -25,9 +21,9 @@
   --clay-soft:  #E8C3AE;
 
   /* Typography */
-  --display: var(--font-display), 'Inter Tight', system-ui, sans-serif;
-  --body:    var(--font-body), 'Manrope', system-ui, sans-serif;
-  --mono:    var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
+  --display: 'Inter Tight', system-ui, sans-serif;
+  --body:    'Manrope', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
 
   /* Radii */
   --r-sm:   6px;
@@ -155,6 +151,7 @@ input, textarea, select { font-family: inherit; }
   z-index: 1;
 }
 .photo-dark .photo-label { background: rgba(0,0,0,0.55); color: #F4EFE6; }
+.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .photo-warm {
   background: repeating-linear-gradient(
@@ -282,18 +279,15 @@ input, textarea, select { font-family: inherit; }
 
 /* ============================================================
    Mobile Responsive Overrides  (≤ 767 px)
-   All rules use !important to override inline styles in JSX.
    ============================================================ */
 
 @media (max-width: 767px) {
 
   /* ── Grid collapse ─────────────────────────── */
-  /* Single column */
   .mob-col1 {
     grid-template-columns: 1fr !important;
     gap: 20px !important;
   }
-  /* Two columns (symptoms, values, etc.) */
   .mob-col2 {
     grid-template-columns: 1fr 1fr !important;
     gap: 12px !important;
@@ -305,19 +299,16 @@ input, textarea, select { font-family: inherit; }
     align-items: flex-start !important;
     gap: 20px !important;
   }
-  /* Section / reviews header: title + action side-by-side → stacked */
   .mob-section-header {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 20px !important;
   }
-  /* Hero stats row */
   .mob-stats-row {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 16px !important;
   }
-  /* CTA button group → full-width stack */
   .mob-btn-stack {
     flex-direction: column !important;
     gap: 10px !important;
@@ -402,4 +393,20 @@ input, textarea, select { font-family: inherit; }
     grid-template-columns: 1fr !important;
     gap: 28px !important;
   }
+}
+
+/* ---- Nav desktop/mobile visibility ---- */
+@media (max-width: 767px) { .nav-desktop { display: none !important; } }
+@media (min-width: 768px) { .nav-mobile  { display: none !important; } }
+
+/* ---- Service card hover (was onMouseEnter/Leave in React) ---- */
+.service-card:hover {
+  border-color: var(--moss) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ---- Nav link hover ---- */
+.nav-link:hover {
+  color: var(--ink) !important;
+  background: var(--paper-2) !important;
 }

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bartokweb.vercel.app/sitemap.xml
